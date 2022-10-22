@@ -8,69 +8,7 @@ function alert(message, type) {
     divAlert.append(wrapper);
 }
 
-//Função chamada pela tag <form>
-function cadastrarDisciplina(event) {
-    //Garante que a tela não seja atualizada ao enviar uma requisição.
-    event.preventDefault();
-
-    let urlSave = 'http://localhost:8080/quadrodehorarios/disciplina/save';
-    let urlUpdate = 'http://localhost:8080/quadrodehorarios/disciplina/update';
-
-    //Recupera os valores que são inseridos nos inputs.
-    let codDisciplina = document.getElementById('codDisciplina').value;
-    let nome = document.getElementById('nome').value;
-
-    if (codDisciplina === '' || nome === '') {
-        alert('Por favor, preencha os campos!', 'danger');
-    } else {
-        if (idEdit === undefined) {
-            //Cria o JSON que será enviado para a API
-            const bodySave = {
-                "codDisciplina": codDisciplina,
-                "nome": nome
-            }
-
-            axios.post(urlSave, bodySave)
-                .then(response => {
-                    if (response.data.CONFLICT) {
-                        alert(response.data.CONFLICT, 'danger');
-                    }
-                    if (response.data.CREATED) {
-                        alert(response.data.CREATED, 'success');
-                    }
-                })
-                .catch(error => {
-                    alert(`Error: ${error.message}`, 'danger');
-                });
-        } else {
-            //Cria o JSON que será enviado para a API
-            const bodyUpdate = {
-                "idDisciplina": idEdit,
-                "codDisciplina": codDisciplinaEdit.value,
-                "nome": nomeEdit.value
-            }
-
-            console.log(bodyUpdate);
-
-            //Monta as configurações de PUT para chamar o método PUT na API
-            axios.put(urlUpdate, bodyUpdate)
-                .then(response => {
-                    if (response.data.NOT_FOUND) {
-                        alert(response.data.NOT_FOUND, 'warning');
-                    }
-                    if (response.data.CONFLICT) {
-                        alert(response.data.CONFLICT, 'danger');
-                    }
-                    if (response.data.ACCEPTED) {
-                        alert(response.data.ACCEPTED, 'success');
-                    }
-
-                })
-                .catch(error => {
-                    alert(`Error: ${error.message}`, 'danger');
-                });
-        }
-    }
+function removeAlert() {
     $("#divAlert").hide();
     $("#divAlert").fadeTo(2000, 500).slideUp(500, function () {
         $('#divAlertContent').remove();
@@ -127,28 +65,6 @@ var idEdit;
 var nomeEdit;
 var codDisciplinaEdit;
 
-function editDisciplina(idDisciplina) {
-    const url = 'http://localhost:8080/quadrodehorarios/disciplina/find/';
-    axios.get(url + idDisciplina)
-        .then(response => {
-            if (response.data.NOT_FOUND) {
-                alert(response.data.NOT_FOUND, 'danger');
-            } else {
-                document.getElementById('btnCadastrar').innerText = 'Alterar';
-
-                idEdit = idDisciplina;
-                nomeEdit = document.getElementById('nome');
-                codDisciplinaEdit = document.getElementById('codDisciplina');
-                nomeEdit.value = `${response.data.nome}`;
-                codDisciplinaEdit.value = `${response.data.codDisciplina}`;
-            }
-        })
-        .catch(error => {
-            alert(`Error: ${error.message}`, 'danger');
-        });
-
-}
-
 function clearFields() {
     idEdit = undefined;
     nomeEdit = undefined;
@@ -157,24 +73,112 @@ function clearFields() {
     document.getElementById('codDisciplina').value = '';
 }
 
+//Função chamada pela tag <form>
+async function cadastrarDisciplina(event) {
+    //Garante que a tela não seja atualizada ao enviar uma requisição.
+    event.preventDefault();
+
+    let urlSave = 'http://localhost:8080/quadrodehorarios/disciplina/save';
+    let urlUpdate = 'http://localhost:8080/quadrodehorarios/disciplina/update';
+
+    //Recupera os valores que são inseridos nos inputs.
+    let codDisciplina = document.getElementById('codDisciplina').value;
+    let nome = document.getElementById('nome').value;
+
+    if (codDisciplina === '' || nome === '') {
+        alert('Por favor, preencha os campos!', 'danger');
+    } else {
+        if (idEdit === undefined) {
+            //Cria o JSON que será enviado para a API
+            const bodySave = {
+                "codDisciplina": codDisciplina,
+                "nome": nome
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", urlSave, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onload = () => {
+                var data = JSON.parse(xhr.responseText);
+                if (data.CONFLICT) {
+                    alert(data.CONFLICT, 'danger');
+                }
+                if (data.CREATED) {
+                    alert(data.CREATED, 'success');
+                }
+            }
+            xhr.send(JSON.stringify(bodySave));
+        } else {
+            //Cria o JSON que será enviado para a API
+            const bodyUpdate = {
+                "idDisciplina": idEdit,
+                "codDisciplina": codDisciplinaEdit.value,
+                "nome": nomeEdit.value
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", urlUpdate, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onload = () => {
+                var data = JSON.parse(xhr.responseText);
+                if (data.NOT_FOUND) {
+                    alert(data.NOT_FOUND, 'warning');
+                }
+                if (data.CONFLICT) {
+                    alert(data.CONFLICT, 'danger');
+                }
+                if (data.ACCEPTED) {
+                    alert(data.ACCEPTED, 'success');
+                }
+            }
+            xhr.send(JSON.stringify(bodyUpdate));
+        }
+    }
+
+    removeAlert();
+}
+
+function editDisciplina(idDisciplina) {
+    const url = 'http://localhost:8080/quadrodehorarios/disciplina/find/';
+
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', url + idDisciplina, true)
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        if (data.NOT_FOUND) {
+            alert(data.NOT_FOUND, 'warning');
+        } else {
+            document.getElementById('btnCadastrar').innerText = 'Alterar';
+            idEdit = idDisciplina;
+            nomeEdit = document.getElementById('nome');
+            codDisciplinaEdit = document.getElementById('codDisciplina');
+            nomeEdit.value = `${data.nome}`;
+            codDisciplinaEdit.value = `${data.codDisciplina}`;
+        }
+    }
+    xhr.send(null);
+}
+
 function deletDisciplina(idDisciplina) {
     const url = 'http://localhost:8080/quadrodehorarios/disciplina/delete/';
-    axios.delete(url + idDisciplina)
-        .then(response => {
-            if (response.data.CONFLICT) {
-                alert(response.data.CONFLICT, 'danger');
-            } else if (response.data.ACCEPTED) {
-                alert(response.data.ACCEPTED, 'success');
-            }
-        })
-        .catch(error => {
-            alert(`Error: ${error.message}`, 'danger');
-        });
-    $("#divAlert").hide();
-    $("#divAlert").fadeTo(2000, 500).slideUp(500, function () {
-        $('#divAlertContent').remove();
-        window.location.reload(true);
-    });
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("DELETE", url + idDisciplina, true);
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        if (data.NOT_FOUND) {
+            alert(data.NOT_FOUND, 'warning');
+        }
+        if (data.CONFLICT) {
+            alert(data.CONFLICT, 'danger');
+        }
+        if (data.ACCEPTED) {
+            alert(data.ACCEPTED, 'success');
+        }
+    }
+    xhr.send(null);
+
+    removeAlert();
 }
 
 function findAll() {
@@ -182,13 +186,16 @@ function findAll() {
     var tBody = document.getElementById('tBody');
     var tr;
 
-    axios.get(url)
-        .then(response => {
-            response.data.forEach(disciplina => {
-                tr = createRow(disciplina);
-                tBody.appendChild(tr);
-            });
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', url, true)
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        data.forEach(disciplina => {
+            tr = createRow(disciplina);
+            tBody.appendChild(tr);
         });
+    }
+    xhr.send(null);
 }
 
 findAll();
