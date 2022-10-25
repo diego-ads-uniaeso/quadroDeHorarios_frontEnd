@@ -16,7 +16,7 @@ function removeAlert() {
     });
 }
 
-function createRow(disciplina) {
+function createRowDisciplinas(disciplina) {
     //Cria os componentes da tabela
     let tr = document.createElement("tr");
     let tdNome = document.createElement("td");
@@ -183,7 +183,7 @@ function deletDisciplina(idDisciplina) {
 
 function findAll() {
     const url = "http://localhost:8080/quadrodehorarios/disciplina/find/all";
-    var tBody = document.getElementById('tBody');
+    var tBody = document.getElementById('tBodyDisciplinas');
     var tr;
 
     var xhr = new XMLHttpRequest()
@@ -191,7 +191,7 @@ function findAll() {
     xhr.onload = () => {
         var data = JSON.parse(xhr.responseText);
         data.forEach(disciplina => {
-            tr = createRow(disciplina);
+            tr = createRowDisciplinas(disciplina);
             tBody.appendChild(tr);
         });
     }
