@@ -253,3 +253,24 @@ function getDisponibilidadesSelecionadas() {
     return idsSelecionados;
 }
 
+function editProfessor(nome) {
+    const url = 'http://localhost:8080/quadrodehorarios/professor/find/all';
+    
+    var xhr = new XMLHttpRequest()
+    xhr.openRequest('GET', url + nome, true)
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        if (data.NOT_FOUND) {
+            alert(data.NOT_FOUND, 'warning');
+        } else {
+            document.getElementById('btnCadastrar').innerText = 'Editar';
+            idEdit = nome;
+            idProfessorEdit = document.querySelector("div#idProfessor");
+            nomeEdit = document.getElementById("nome");
+            
+            nomeEdit.value = `${data.nome}`;
+            idProfessorEdit.value = `${data.idProfessor}`;
+        }
+    }
+    xhr.send(null);
+}

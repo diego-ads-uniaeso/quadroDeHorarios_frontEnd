@@ -1,0 +1,14 @@
+#tBodyDisciplinas {
+    display: block;
+    max-height: 250px;
+    overflow-y: scroll;
+}
+
+tr {
+    display: table;
+    width: 100%;
+}
+
+button#btnEditar {
+    float: right;
+}
