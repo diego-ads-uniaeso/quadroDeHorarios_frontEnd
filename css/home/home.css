@@ -1,5 +1,6 @@
-.background{
+#background{
     background-image: url('../../assets/img/ads.jpg');
-    height: auto;
-    width: auto;
+    width: 1920px;
+    height: 1080px;
+    background-size: 100%;
 }
