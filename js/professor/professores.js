@@ -19,6 +19,7 @@ function removeAlert() {
 }
 
 function createRowDisciplina(disciplina) {
+
     //Cria os componentes da tabela
     let tr = document.createElement("tr");
     let tdCheck = document.createElement("td");
@@ -50,6 +51,7 @@ function createRowDisciplina(disciplina) {
 
 function createRowProfessor(professor) {
     console.log(professor)
+
     //Cria os componentes da tabela
     let tr = document.createElement("tr");
     let tdNome = document.createElement("td");
@@ -62,10 +64,10 @@ function createRowProfessor(professor) {
     //Adiciona os atributos de cada componente
     buttonEdit.setAttribute('type', 'button');
     buttonEdit.setAttribute('class', 'btn btn-warning bg-warning');
-    buttonEdit.setAttribute('id', `${professor.idDisciplina}`);
+    buttonEdit.setAttribute('id', `${professor.idProfessor}`);
     buttonDelete.setAttribute('class', 'btn btn-danger bg-danger');
     buttonDelete.setAttribute('style', 'margin-left: 5px');
-    buttonDelete.setAttribute('id', `${professor.idDisciplina}`);
+    buttonDelete.setAttribute('id', `${professor.idProfessor}`);
     spanEdit.setAttribute('class', 'material-icons');
     spanDelete.setAttribute('class', 'material-icons');
     tdNome.setAttribute('class', 'col-6');
@@ -88,41 +90,17 @@ function createRowProfessor(professor) {
     return tr;
 }
 
-function cadastrarProfessor(event) {
-    //Não deletar a tela quando enviar os dados
-    event.preventDefault();
+var idEdit;
+var nomeEdit;
+var idDisponibilidadeEdit;
 
-    const urlSave = 'http://localhost:8080/quadrodehorarios/professor/save';
-
-    var nome = document.getElementById('nome').value;
-
-    var bodyProfessor = {
-        nome: nome,
-        disciplinas: getDisciplinasSelecionadas(),
-        disponibilidade: getDisponibilidadesSelecionadas()
-    }
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", urlSave, true);
-    xhr.setRequestHeader('content-type', 'application/json; charset=utf-8');
-    xhr.onload = () => {
-        var data = JSON.parse(xhr.responseText);
-        if (data.NOT_FOUND) {
-            alert(data.NOT_FOUND, 'warning');
-        }
-        if (data.CONFLICT) {
-            alert(data.CONFLICT, 'danger');
-        }
-        if (data.ACCEPTED) {
-            alert(data.ACCEPTED, 'success');
-        }
-    }
+function clearFields() {
+    idEdit = undefined;
+    nomeEdit = undefined;
+    idDisponibilidadeEdit = undefined;
     
-    console.log(JSON.stringify(bodyProfessor));
-
-//    xhr.send(JSON.stringify(bodyProfessor));
-
-
+    document.querySelector("input#nome").value = '';
+    document.getElementById('idDisponibilidade').value = '';
 }
 
 function clearFields() {
@@ -155,23 +133,6 @@ function clearFields() {
 
 }
 
-function findAllDisciplinas() {
-    const url = "http://localhost:8080/quadrodehorarios/disciplina/find/all";
-    var tBody = document.getElementById('tBodyDisciplinas');
-    var tr;
-
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
-    xhr.onload = () => {
-        var data = JSON.parse(xhr.responseText);
-        data.forEach(disciplina => {
-            tr = createRowDisciplina(disciplina);
-            tBody.appendChild(tr);
-        });
-    }
-    xhr.send(null);
-}
-
 findAllDisciplinas();
 
 function getDisciplinasSelecionadas() {
@@ -193,30 +154,27 @@ function getDisciplinasSelecionadas() {
     return idsSelecionados;
 }
 
-function findAllProfessores() {
-    const url = "http://localhost:8080/quadrodehorarios/professor/find/all";
-    var tBody = document.getElementById('tBodyProfessores');
+function findAllDisciplinas() {
+    const url = "http://localhost:8080/quadrodehorarios/disciplina/find/all";
+    var tBody = document.getElementById('tBodyDisciplinas');
     var tr;
 
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
     xhr.onload = () => {
         var data = JSON.parse(xhr.responseText);
-        data.forEach(professor => {
-            tr = createRowProfessor(professor);
+        data.forEach(disciplina => {
+            tr = createRowDisciplina(disciplina);
             tBody.appendChild(tr);
         });
     }
     xhr.send(null);
 }
 
-findAllProfessores();
-
 function getDisponibilidadesSelecionadas() {
     var ids = document.getElementById('tBodyDisponibilidade').children;
-
     var idsSelecionados = [];
-
+    
     for (var x = 0; x < 7; x++) {
         idsSelecionados[x] = [];
     }
@@ -245,32 +203,118 @@ function getDisponibilidadesSelecionadas() {
             }
         }
     }
-
     if (vazio === true) {
         alert('Selecione pelo menos 1 disponibilidade!', 'danger');
     }
-
     return idsSelecionados;
 }
 
-function editProfessor(nome) {
-    const url = 'http://localhost:8080/quadrodehorarios/professor/find/all';
-    
+// function editProfessor(idProfessor) {
+
+//     const url = 'http://localhost:8080/quadrodehorarios/professor/find/all';
+
+//     var xhr = new XMLHttpRequest()
+
+//     xhr.open('GET', url + idProfessor, true)
+//     xhr.onload = () => {
+//         var data = JSON.parse(xhr.responseText);
+//         if (data.NOT_FOUND) {
+//             alert(data.NOT_FOUND, 'warning');
+//         } else {
+//             document.getElementById('btnCadastrar').innerText = 'Editar';
+//             idEdit = idProfessor;
+//             idProfessorEdit = document.querySelector("div#idProfessor");
+//             nomeEdit = document.getElementById("nome");
+//             nomeEdit.value = `${data.nome}`;
+//             idProfessorEdit.value = `${data.idProfessor}`;
+//         }
+//     }
+//     xhr.send(null);
+// }
+
+function cadastrarProfessor(event) {
+
+    //Não deletar a tela quando enviar os dados
+    event.preventDefault();
+
+    const urlSave = 'http://localhost:8080/quadrodehorarios/professor/save'
+    const urlUpdate = 'http://localhost:8080/quadrodehorarios/professor/update';
+
+    var nome = document.querySelector("input#nome").value;
+
+    if (nome === '' || getDisponibilidadesSelecionadas() === null || getDisciplinasSelecionadas() === null) {
+        alert('Por favor, preencha os campos!', 'danger');
+    } else {
+        if (idEdit === undefined) {
+
+            //Cria o JSON que será enviado para a API
+            const bodySaveProfessor = {
+                "nome": nome,
+                "disciplinas": getDisciplinasSelecionadas(),
+                "disponibilidade": getDisponibilidadesSelecionadas()
+            }
+            
+            //Enviar um Request pro banco pra salvar o professor            var xhr = new XMLHttpRequest();
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", urlSave, true);
+            xhr.setRequestHeader('content-type', 'application/json; charset=utf-8');
+            xhr.onload = () => {
+                var data = JSON.parse(xhr.responseText);
+                if (data.NOT_FOUND) {
+                    alert(data.NOT_FOUND, 'warning');
+                }
+                if (data.CONFLICT) {
+                    alert(data.CONFLICT, 'danger');
+                }
+                if (data.ACCEPTED) {
+                    alert(data.ACCEPTED, 'success');
+                }
+            }
+            xhr.send(JSON.stringify(bodySaveProfessor));
+        } else {
+
+            //Cria o JSON que será enviado para a API
+            const bodyUpdateProfessor = {
+                "id_professor": idEdit,
+                "nome": nomeEdit.value,
+                "disponibilidades": idDisponibilidadeEdit.value
+            }
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", urlUpdate, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onload = () => {
+                var data = JSON.parse(xhr.responseText);
+                if (data.NOT_FOUND) {
+                    alert(data.NOT_FOUND, 'warning');
+                }
+                if (data.CONFLICT) {
+                    alert(data.CONFLICT, 'danger');
+                }
+                if (data.ACCEPTED) {
+                    alert(data.ACCEPTED, 'success');
+                }
+            }
+            xhr.send(JSON.stringify(bodyUpdateProfessor));
+        }
+    }
+    removeAlert();
+}
+
+function findAllProfessores() {
+    const url = "http://localhost:8080/quadrodehorarios/professor/find/all";
+    var tBody = document.getElementById('tBodyProfessores');
+    var tr;
+
     var xhr = new XMLHttpRequest()
-    xhr.openRequest('GET', url + nome, true)
+    xhr.open('GET', url, true)
     xhr.onload = () => {
         var data = JSON.parse(xhr.responseText);
-        if (data.NOT_FOUND) {
-            alert(data.NOT_FOUND, 'warning');
-        } else {
-            document.getElementById('btnCadastrar').innerText = 'Editar';
-            idEdit = nome;
-            idProfessorEdit = document.querySelector("div#idProfessor");
-            nomeEdit = document.getElementById("nome");
-            
-            nomeEdit.value = `${data.nome}`;
-            idProfessorEdit.value = `${data.idProfessor}`;
-        }
+        data.forEach(professor => {
+            tr = createRowProfessor(professor);
+            tBody.appendChild(tr);
+        });
     }
     xhr.send(null);
 }
+findAllProfessores();
