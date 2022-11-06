@@ -50,7 +50,6 @@ function createRowDisciplina(disciplina) {
 }
 
 function createRowProfessor(professor) {
-    console.log(professor)
 
     //Cria os componentes da tabela
     let tr = document.createElement("tr");
@@ -68,6 +67,7 @@ function createRowProfessor(professor) {
     buttonDelete.setAttribute('class', 'btn btn-danger bg-danger');
     buttonDelete.setAttribute('style', 'margin-left: 5px');
     buttonDelete.setAttribute('id', `${professor.idProfessor}`);
+    buttonDelete.setAttribute('onClick', 'deleteProfessor(this.id)');
     spanEdit.setAttribute('class', 'material-icons');
     spanDelete.setAttribute('class', 'material-icons');
     tdNome.setAttribute('class', 'col-6');
@@ -90,70 +90,6 @@ function createRowProfessor(professor) {
     return tr;
 }
 
-var idEdit;
-var nomeEdit;
-var idDisponibilidadeEdit;
-
-function clearFields() {
-    idEdit = undefined;
-    nomeEdit = undefined;
-    idDisponibilidadeEdit = undefined;
-    
-    document.querySelector("input#nome").value = '';
-    document.getElementById('idDisponibilidade').value = '';
-}
-
-function clearFields() {
-
-    document.getElementById('nome').value = '';
-
-    var idsDisponibilidade = document.getElementById('tBodyDisponibilidade').children;
-
-    for (var x = 0; x < 7; x++) {
-        for (var y = 1; y < 7; y++) {
-            for (var z = 0; z < 7; z++) {
-                if (typeof idsDisponibilidade[x].children[y].children[z] == 'object') {
-                    if (idsDisponibilidade[x].children[y].children[z].checked) {
-                        document.getElementById('tBodyDisponibilidade').children[x].children[y].children[z].checked = false;
-                    }
-                }
-            }
-        }
-    }
-
-    var idsDisciplinas = document.getElementById('tBodyDisciplinas').children;
-
-    for (var x = 0; x < idsDisciplinas.length; x++) {
-        if (typeof idsDisciplinas[x].children == 'object') {
-            if (idsDisciplinas[x].children[0].children[0].checked) {
-                document.getElementById('tBodyDisciplinas').children[x].children[0].children[0].checked = false;
-            }
-        }
-    }
-
-}
-
-findAllDisciplinas();
-
-function getDisciplinasSelecionadas() {
-    var ids = document.getElementsByClassName('idDisciplina');
-    var idsSelecionados = [];
-
-    for (var x = 0; x <= ids.length; x++) {
-        if (typeof ids[x] == 'object') {
-            if (ids[x].checked) {
-                idsSelecionados.push(ids[x].id)
-            }
-        }
-    }
-
-    if (idsSelecionados.length <= 0) {
-        alert('Selecione pelo menos 1 disciplina!', 'danger');
-    }
-
-    return idsSelecionados;
-}
-
 function findAllDisciplinas() {
     const url = "http://localhost:8080/quadrodehorarios/disciplina/find/all";
     var tBody = document.getElementById('tBodyDisciplinas');
@@ -171,134 +107,27 @@ function findAllDisciplinas() {
     xhr.send(null);
 }
 
-function getDisponibilidadesSelecionadas() {
-    var ids = document.getElementById('tBodyDisponibilidade').children;
+findAllDisciplinas();
+
+function getDisciplinasSelecionadas() {
+    var ids = document.getElementsByClassName('idDisciplina');
     var idsSelecionados = [];
-    
-    for (var x = 0; x < 7; x++) {
-        idsSelecionados[x] = [];
-    }
 
-    for (var x = 0; x < 7; x++) {
-        for (var y = 1; y < 7; y++) {
-            for (var z = 0; z < 7; z++) {
-                if (typeof ids[x].children[y].children[z] == 'object') {
-                    if (ids[x].children[y].children[z].checked) {
-                        idsSelecionados[x][y - 1] = 1;
-                    } else {
-                        idsSelecionados[x][y - 1] = 0;
-                    }
-                }
+    for (var x = 0; x <= ids.length; x++) {
+        if (typeof ids[x] == 'object') {
+            if (ids[x].checked) {
+                var selecionado = new Object();
+                selecionado.idDisciplina = ids[x].id;
+                idsSelecionados.push(JSON.parse(JSON.stringify(selecionado)));
             }
         }
     }
 
-    var vazio = true;
+    if (idsSelecionados.length <= 0) {
+        alert('Selecione pelo menos 1 disciplina!', 'danger');
+    }
 
-    for (var x = 0; x < 7; x++) {
-        for (var y = 0; y < 7; y++) {
-            if (idsSelecionados[x][y] === 1) {
-                vazio = false;
-                break;
-            }
-        }
-    }
-    if (vazio === true) {
-        alert('Selecione pelo menos 1 disponibilidade!', 'danger');
-    }
     return idsSelecionados;
-}
-
-// function editProfessor(idProfessor) {
-
-//     const url = 'http://localhost:8080/quadrodehorarios/professor/find/all';
-
-//     var xhr = new XMLHttpRequest()
-
-//     xhr.open('GET', url + idProfessor, true)
-//     xhr.onload = () => {
-//         var data = JSON.parse(xhr.responseText);
-//         if (data.NOT_FOUND) {
-//             alert(data.NOT_FOUND, 'warning');
-//         } else {
-//             document.getElementById('btnCadastrar').innerText = 'Editar';
-//             idEdit = idProfessor;
-//             idProfessorEdit = document.querySelector("div#idProfessor");
-//             nomeEdit = document.getElementById("nome");
-//             nomeEdit.value = `${data.nome}`;
-//             idProfessorEdit.value = `${data.idProfessor}`;
-//         }
-//     }
-//     xhr.send(null);
-// }
-
-function cadastrarProfessor(event) {
-
-    //Não deletar a tela quando enviar os dados
-    event.preventDefault();
-
-    const urlSave = 'http://localhost:8080/quadrodehorarios/professor/save'
-    const urlUpdate = 'http://localhost:8080/quadrodehorarios/professor/update';
-
-    var nome = document.querySelector("input#nome").value;
-
-    if (nome === '' || getDisponibilidadesSelecionadas() === null || getDisciplinasSelecionadas() === null) {
-        alert('Por favor, preencha os campos!', 'danger');
-    } else {
-        if (idEdit === undefined) {
-
-            //Cria o JSON que será enviado para a API
-            const bodySaveProfessor = {
-                "nome": nome,
-                "disciplinas": getDisciplinasSelecionadas(),
-                "disponibilidade": getDisponibilidadesSelecionadas()
-            }
-            
-            //Enviar um Request pro banco pra salvar o professor            var xhr = new XMLHttpRequest();
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", urlSave, true);
-            xhr.setRequestHeader('content-type', 'application/json; charset=utf-8');
-            xhr.onload = () => {
-                var data = JSON.parse(xhr.responseText);
-                if (data.NOT_FOUND) {
-                    alert(data.NOT_FOUND, 'warning');
-                }
-                if (data.CONFLICT) {
-                    alert(data.CONFLICT, 'danger');
-                }
-                if (data.ACCEPTED) {
-                    alert(data.ACCEPTED, 'success');
-                }
-            }
-            xhr.send(JSON.stringify(bodySaveProfessor));
-        } else {
-
-            //Cria o JSON que será enviado para a API
-            const bodyUpdateProfessor = {
-                "id_professor": idEdit,
-                "nome": nomeEdit.value,
-                "disponibilidades": idDisponibilidadeEdit.value
-            }
-            
-            var xhr = new XMLHttpRequest();
-            xhr.open("PUT", urlUpdate, true);
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            xhr.onload = () => {
-                var data = JSON.parse(xhr.responseText);
-                if (data.NOT_FOUND) {
-                    alert(data.NOT_FOUND, 'warning');
-                }
-                if (data.CONFLICT) {
-                    alert(data.CONFLICT, 'danger');
-                }
-                if (data.ACCEPTED) {
-                    alert(data.ACCEPTED, 'success');
-                }
-            }
-            xhr.send(JSON.stringify(bodyUpdateProfessor));
-        }
-    }
-    removeAlert();
 }
 
 function findAllProfessores() {
@@ -317,4 +146,112 @@ function findAllProfessores() {
     }
     xhr.send(null);
 }
+
 findAllProfessores();
+
+function getDisponibilidadesSelecionadas() {
+    var disponibilidade = document.getElementById('tBodyDisponibilidade').children;
+
+    var selecionadas = [];
+
+    for (var x = 0; x < 7; x++) {
+        selecionadas[x] = [];
+    }
+
+    for (var x = 0; x < 7; x++) {
+        for (var y = 1; y < 7; y++) {
+            for (var z = 0; z < 7; z++) {
+                if (typeof disponibilidade[x].children[y].children[z] == 'object') {
+                    if (disponibilidade[x].children[y].children[z].checked) {
+                        selecionadas[x][y - 1] = 1;
+                    } else {
+                        selecionadas[x][y - 1] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    var vazio = true;
+
+    for (var x = 0; x < 7; x++) {
+        for (var y = 0; y < 7; y++) {
+            if (selecionadas[x][y] === 1) {
+                vazio = false;
+                break;
+            }
+        }
+    }
+
+    if (vazio === true) {
+        alert('Selecione pelo menos 1 disponibilidade!', 'danger');
+    }
+
+    return selecionadas;
+}
+
+function montarProfessor() {
+    var nome = document.getElementById('nome').value;
+
+    if (nome === '') {
+        alert('Por favor, informe o nome do professor!', 'danger');
+        removeAlert();
+        return;
+    }
+
+    var professor = new Object();
+    professor.nome = nome;
+    professor.disciplinas = getDisciplinasSelecionadas();
+    professor.disponibilidade = getDisponibilidadesSelecionadas();
+
+    return professor;
+}
+
+//Função chamada pela tag <form>
+async function cadastrarProfessor(event) {
+    //Garante que a tela não seja atualizada ao enviar uma requisição.
+    event.preventDefault();
+
+    let urlSave = 'http://localhost:8080/quadrodehorarios/professor/save';
+
+    //Recupera os valores da tela.
+    var professor = montarProfessor();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", urlSave, true);
+    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        if (data.CONFLICT) {
+            alert(data.CONFLICT, 'danger');
+        }
+        if (data.CREATED) {
+            alert(data.CREATED, 'success');
+        }
+    }
+    xhr.send(JSON.stringify(professor));
+
+    removeAlert();
+}
+
+function deleteProfessor(idProfessor) {
+    const url = 'http://localhost:8080/quadrodehorarios/professor/delete/';
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("DELETE", url + idProfessor, true);
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        if (data.NOT_FOUND) {
+            alert(data.NOT_FOUND, 'warning');
+        }
+        if (data.CONFLICT) {
+            alert(data.CONFLICT, 'danger');
+        }
+        if (data.ACCEPTED) {
+            alert(data.ACCEPTED, 'success');
+        }
+    }
+    xhr.send(null);
+
+    removeAlert();
+}
