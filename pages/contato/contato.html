@@ -13,7 +13,7 @@
 
 <body>
     <img src="../../assets/img/ads.jpg" alt="Background Image">
-    <div class="disciplina">
+    <div class="contato">
         <header>
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
@@ -31,55 +31,79 @@
                                 <a class="nav-link" href="#">Gerar Quadro</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" href="../disciplina/disciplinas.html">Disciplinas</a>
+                                <a class="nav-link" href="../disciplina/disciplinas.html">Disciplinas</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="../professor/professores.html">Professores</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="../contato/contato.html">Contato</a>
+                                <a class="nav-link active" href="../contato/contato.html">Contato</a>
                             </li>
                         </ul>
                     </div>
                 </div>
             </nav>
         </header>
+        <div class="card-group">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Diego Pereira</h5>
+                    <p class="card-text">diego.pereira@aluno.uniaeso.edu.br</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Guilheme Augusto</h5>
+                    <p class="card-text">guilherme.augusto@aluno.uniaeso.edu.br</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Allysson Anacleto</h5>
+                    <p class="card-text">allysson.anacleto@aluno.uniaeso.edu.br</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Davi Clemente</h5>
+                    <p class="card-text">davi.clemente@aluno.uniaeso.edu.br</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Raphael Jucius</h5>
+                    <p class="card-text">raphael.jucius@aluno.uniaeso.edu.br</p>
+                </div>
+            </div>
+        </div>
         <div class="container">
             <br><br>
-            <h2>Disciplinas</h2>
+            <h2>Contato</h2>
             <br><br>
             <div id="divAlert"></div>
-            <form onsubmit="cadastrarDisciplina(event)">
-                <div class="mb-3">
-                    <label for="codDisciplina" class="form-label">Código</label>
-                    <input type="text" class="form-control" id="codDisciplina"
-                        placeholder="Código da disciplina. Ex.: 'AI'">
+            <form>
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="btnradio" id="reclamacao" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="reclamacao">Reclamação</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="elogio" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="elogio">Elogio</label>
                 </div>
+                <br><br>
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome</label>
-                    <input type="text" class="form-control" id="nome"
-                        placeholder="Nome da disciplina. Ex.: 'Inteligência Artificial'">
+                    <input type="text" class="form-control" id="nome" placeholder="Ex.: José Amaral dos Santos">
+                </div>
+                <div class="mb-3">
+                    <label for="comentario" class="form-label">Comentário</label>
+                    <textarea class="form-control" placeholder="Escreva seu comentário..." id="comentario"
+                        style="height: 100px"></textarea>
                 </div>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button type="submit" class="btn btn-success" id="btnCadastrar">Cadastrar</button>
-                    <button type="button" class="btn btn-primary" id="btnLimpar" onclick="clearFields()">Limpar</button>
+                    <button type="submit" class="btn btn-success" id="btnCadastrar">Enviar</button>
+                    <button type="reset" class="btn btn-primary" id="btnLimpar">Limpar</button>
                 </div>
             </form>
-        </div>
-        <br>
-        <div class="container">
-            <br>
-            <table class="table table-hover" id="divTableDisciplinas">
-                <thead>
-                    <tr>
-                        <td class="col-3">CÓDIGO</td>
-                        <td class="col-6">NOME</td>
-                        <td class="col-3">AÇÕES</td>
-                    </tr>
-                </thead>
-                <tbody id="tBodyDisciplinas">
-                </tbody>
-            </table>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
