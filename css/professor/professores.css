@@ -1,0 +1,14 @@
+#tBodyDisciplinas, #tBodyProfessores {
+    display: block;
+    max-height: 250px;
+    overflow-y: scroll;
+}
+
+tr {
+    display: table;
+    width: 100%;
+}
+
+.idDisponibilidade, .idDisciplina {
+    cursor: pointer;
+}
