@@ -64,6 +64,7 @@ function createRowProfessor(professor) {
     buttonEdit.setAttribute('type', 'button');
     buttonEdit.setAttribute('class', 'btn btn-warning bg-warning');
     buttonEdit.setAttribute('id', `${professor.idProfessor}`);
+    buttonEdit.setAttribute('onClick', 'editProfessor(this.id)');
     buttonDelete.setAttribute('class', 'btn btn-danger bg-danger');
     buttonDelete.setAttribute('style', 'margin-left: 5px');
     buttonDelete.setAttribute('id', `${professor.idProfessor}`);
@@ -90,25 +91,6 @@ function createRowProfessor(professor) {
     return tr;
 }
 
-function findAllDisciplinas() {
-    const url = "http://localhost:8080/quadrodehorarios/disciplina/find/all";
-    var tBody = document.getElementById('tBodyDisciplinas');
-    var tr;
-
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
-    xhr.onload = () => {
-        var data = JSON.parse(xhr.responseText);
-        data.forEach(disciplina => {
-            tr = createRowDisciplina(disciplina);
-            tBody.appendChild(tr);
-        });
-    }
-    xhr.send(null);
-}
-
-findAllDisciplinas();
-
 function getDisciplinasSelecionadas() {
     var ids = document.getElementsByClassName('idDisciplina');
     var idsSelecionados = [];
@@ -130,24 +112,24 @@ function getDisciplinasSelecionadas() {
     return idsSelecionados;
 }
 
-function findAllProfessores() {
-    const url = "http://localhost:8080/quadrodehorarios/professor/find/all";
-    var tBody = document.getElementById('tBodyProfessores');
+function findAllDisciplinas() {
+    const url = "http://localhost:8080/quadrodehorarios/disciplina/find/all";
+    var tBody = document.getElementById('tBodyDisciplinas');
     var tr;
 
     var xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
     xhr.onload = () => {
         var data = JSON.parse(xhr.responseText);
-        data.forEach(professor => {
-            tr = createRowProfessor(professor);
+        data.forEach(disciplina => {
+            tr = createRowDisciplina(disciplina);
             tBody.appendChild(tr);
         });
     }
     xhr.send(null);
 }
 
-findAllProfessores();
+findAllDisciplinas();
 
 function getDisponibilidadesSelecionadas() {
     var disponibilidade = document.getElementById('tBodyDisponibilidade').children;
@@ -234,6 +216,60 @@ async function cadastrarProfessor(event) {
     removeAlert();
 }
 
+var idEdit;
+var nomeEdit;
+var disponibilidadeEdit;
+var disciplinaEdit;
+
+function clearFields() {
+    idEdit = undefined;
+    nomeEdit = undefined;
+    disponibilidadeEdit = undefined;
+
+    document.getElementById('nome').value = '';
+    disponibilidadeEdit = document.getElementById('tBodyDisponibilidade').children;
+
+    var selecionadas = [];
+
+    for (var x = 0; x < 7; x++) {
+        selecionadas[x] = [];
+    }
+
+    for (var x = 0; x < 7; x++) {
+        for (var y = 1; y < 7; y++) {
+            for (var z = 0; z < 7; z++) {
+                if (typeof disponibilidadeEdit[x].children[y].children[z] == 'object') {
+                    if (disponibilidadeEdit[x].children[y].children[z].checked = false) {
+                        selecionadas[x][y - 1] = 1;
+                    } else {
+                        selecionadas[x][y - 1] = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function editProfessor(idProfessor) {
+    const url = "http://localhost:8080/quadrodehorarios/professor/find/byId/{idProfessor}"
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, idProfessor, true);
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        if (data.NOT_FOUND) {
+            alert(data.NOT_FOUND, 'warning');
+        } else {
+            document.getElementById("btnCadastrar").innerText = "Alterar";
+            idEdit = idProfessor;
+            nomeEdit = document.getElementById("nome");
+            nomeEdit.value = `${data.nome}`;
+            disponibilidadeEdit = `${data.disponibilidade}`
+        }
+    }
+    xhr.send(null);
+}
+
 function deleteProfessor(idProfessor) {
     const url = 'http://localhost:8080/quadrodehorarios/professor/delete/';
 
@@ -255,3 +291,22 @@ function deleteProfessor(idProfessor) {
 
     removeAlert();
 }
+
+function findAllProfessores() {
+    const url = "http://localhost:8080/quadrodehorarios/professor/find/all";
+    var tBody = document.getElementById('tBodyProfessores');
+    var tr;
+
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', url, true)
+    xhr.onload = () => {
+        var data = JSON.parse(xhr.responseText);
+        data.forEach(professor => {
+            tr = createRowProfessor(professor);
+            tBody.appendChild(tr);
+        });
+    }
+    xhr.send(null);
+}
+
+findAllProfessores();
