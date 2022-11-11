@@ -8,11 +8,13 @@ function alert(message, type) {
     divAlert.append(wrapper);
 }
 
-function removeAlert() {
+function removeAlert(atualiza) {
     $("#divAlert").hide();
     $("#divAlert").fadeTo(2000, 500).slideUp(500, function () {
         $('#divAlertContent').remove();
-        window.location.reload(true);
+        if(atualiza) {
+            window.location.reload(true);
+        }
     });
 }
 
@@ -70,6 +72,14 @@ function clearFields() {
     document.getElementById('btnCadastrar').innerText = 'Cadastrar';
 }
 
+function montarDisciplina() {
+    var disciplina = new Object();
+    disciplina.nome = document.getElementById('nome').value;
+    disciplina.codDisciplina = document.getElementById('codDisciplina').value;
+
+    return disciplina;
+}
+
 //Função chamada pela tag <form>
 async function cadastrarDisciplina(event) {
     //Garante que a tela não seja atualizada ao enviar uma requisição.
@@ -79,60 +89,48 @@ async function cadastrarDisciplina(event) {
     let urlUpdate = 'http://localhost:8080/quadrodehorarios/disciplina/update';
 
     //Recupera os valores que são inseridos nos inputs.
-    let codDisciplina = document.getElementById('codDisciplina').value;
-    let nome = document.getElementById('nome').value;
+    var disciplina = montarDisciplina();
 
-    if (codDisciplina === '' || nome === '') {
-        alert('Por favor, preencha os campos!', 'danger');
-    } else {
-        if (idEdit === undefined) {
-            //Cria o JSON que será enviado para a API
-            const bodySave = {
-                "codDisciplina": codDisciplina,
-                "nome": nome
+    if (idEdit === undefined) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", urlSave, true);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        xhr.onload = () => {
+            var data = JSON.parse(xhr.responseText);
+            if (data.CONFLICT) {
+                alert(data.CONFLICT, 'danger');
+                removeAlert(false);
             }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", urlSave, true);
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            xhr.onload = () => {
-                var data = JSON.parse(xhr.responseText);
-                if (data.CONFLICT) {
-                    alert(data.CONFLICT, 'danger');
-                }
-                if (data.CREATED) {
-                    alert(data.CREATED, 'success');
-                }
+            if (data.CREATED) {
+                alert(data.CREATED, 'success');
+                removeAlert(true);
             }
-            xhr.send(JSON.stringify(bodySave));
-        } else {
-            //Cria o JSON que será enviado para a API
-            const bodyUpdate = {
-                "idDisciplina": idEdit,
-                "codDisciplina": codDisciplinaEdit.value,
-                "nome": nomeEdit.value
-            }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("PUT", urlUpdate, true);
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            xhr.onload = () => {
-                var data = JSON.parse(xhr.responseText);
-                if (data.NOT_FOUND) {
-                    alert(data.NOT_FOUND, 'warning');
-                }
-                if (data.CONFLICT) {
-                    alert(data.CONFLICT, 'danger');
-                }
-                if (data.ACCEPTED) {
-                    alert(data.ACCEPTED, 'success');
-                }
-            }
-            xhr.send(JSON.stringify(bodyUpdate));
         }
-    }
+        xhr.send(JSON.stringify(disciplina));
+    } else {
+        //Cria o JSON que será enviado para a API
+        disciplina.idDisciplina = idEdit;
 
-    removeAlert();
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", urlUpdate, true);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        xhr.onload = () => {
+            var data = JSON.parse(xhr.responseText);
+            if (data.NOT_FOUND) {
+                alert(data.NOT_FOUND, 'warning');
+                removeAlert(false);
+            }
+            if (data.CONFLICT) {
+                alert(data.CONFLICT, 'danger');
+                removeAlert(false);
+            }
+            if (data.ACCEPTED) {
+                alert(data.ACCEPTED, 'success');
+                removeAlert(true);
+            }
+        }
+        xhr.send(JSON.stringify(disciplina));
+    }
 }
 
 function editDisciplina(idDisciplina) {
@@ -144,6 +142,7 @@ function editDisciplina(idDisciplina) {
         var data = JSON.parse(xhr.responseText);
         if (data.NOT_FOUND) {
             alert(data.NOT_FOUND, 'warning');
+            removeAlert(false);
         } else {
             document.getElementById('btnCadastrar').innerText = 'Alterar';
             idEdit = idDisciplina;
@@ -163,17 +162,19 @@ function deletDisciplina(idDisciplina) {
         var data = JSON.parse(xhr.responseText);
         if (data.NOT_FOUND) {
             alert(data.NOT_FOUND, 'warning');
+            removeAlert(false);
         }
         if (data.CONFLICT) {
             alert(data.CONFLICT, 'danger');
+            removeAlert(false);
         }
         if (data.ACCEPTED) {
             alert(data.ACCEPTED, 'success');
+            removeAlert(true);
         }
     }
     xhr.send(null);
 
-    removeAlert();
 }
 
 function findAll() {
