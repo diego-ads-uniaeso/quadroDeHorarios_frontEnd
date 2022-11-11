@@ -62,15 +62,12 @@ function createRowDisciplinas(disciplina) {
 }
 
 var idEdit;
-var nomeEdit;
-var codDisciplinaEdit;
 
 function clearFields() {
     idEdit = undefined;
-    nomeEdit = undefined;
-    codDisciplinaEdit = undefined;
     document.getElementById('nome').value = '';
     document.getElementById('codDisciplina').value = '';
+    document.getElementById('btnCadastrar').innerText = 'Cadastrar';
 }
 
 //Função chamada pela tag <form>
@@ -150,10 +147,8 @@ function editDisciplina(idDisciplina) {
         } else {
             document.getElementById('btnCadastrar').innerText = 'Alterar';
             idEdit = idDisciplina;
-            nomeEdit = document.getElementById('nome');
-            codDisciplinaEdit = document.getElementById('codDisciplina');
-            nomeEdit.value = `${data.nome}`;
-            codDisciplinaEdit.value = `${data.codDisciplina}`;
+            document.getElementById('nome').value = data.nome;
+            document.getElementById('codDisciplina').value = data.codDisciplina;
         }
     }
     xhr.send(null);
