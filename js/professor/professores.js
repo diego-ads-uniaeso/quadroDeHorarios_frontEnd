@@ -8,11 +8,13 @@ function alert(message, type) {
     divAlert.append(wrapper);
 }
 
-function removeAlert() {
+function removeAlert(atualiza) {
     $("#divAlert").hide();
     $("#divAlert").fadeTo(2000, 500).slideUp(500, function () {
         $('#divAlertContent').remove();
-        window.location.reload(true);
+        if (atualiza) {
+            window.location.reload(true);
+        }
     });
 }
 
@@ -119,10 +121,6 @@ function getDisciplinasSelecionadas() {
         }
     }
 
-    if (idsSelecionados.length <= 0) {
-        alert('Selecione pelo menos 1 disciplina!', 'danger');
-    }
-
     return idsSelecionados;
 }
 
@@ -168,38 +166,15 @@ function getDisponibilidadesSelecionadas() {
         }
     }
 
-    var vazio = true;
-
-    for (var x = 0; x < 7; x++) {
-        for (var y = 0; y < 7; y++) {
-            if (selecionadas[x][y] === 1) {
-                vazio = false;
-                break;
-            }
-        }
-    }
-
-    if (vazio === true) {
-        alert('Selecione pelo menos 1 disponibilidade!', 'danger');
-    }
-
     return selecionadas;
 }
 
 function montarProfessor() {
-    var nome = document.getElementById('nome').value;
-
-    if (nome === '') {
-        alert('Por favor, informe o nome do professor!', 'danger');
-        removeAlert();
-        return;
-    }
-
     var professor = new Object();
-    professor.nome = nome;
+    professor.nome = nome = document.getElementById('nome').value;
     professor.disciplinas = getDisciplinasSelecionadas();
     professor.disponibilidade = getDisponibilidadesSelecionadas();
-    
+
     return professor;
 }
 
@@ -221,14 +196,14 @@ async function cadastrarProfessor(event) {
         var data = JSON.parse(xhr.responseText);
         if (data.CONFLICT) {
             alert(data.CONFLICT, 'danger');
+            removeAlert(false);
         }
         if (data.CREATED) {
             alert(data.CREATED, 'success');
+            removeAlert(true);
         }
     }
     xhr.send(JSON.stringify(professor));
-
-    removeAlert();
 }
 
 function deleteProfessor(idProfessor) {
@@ -240,15 +215,16 @@ function deleteProfessor(idProfessor) {
         var data = JSON.parse(xhr.responseText);
         if (data.NOT_FOUND) {
             alert(data.NOT_FOUND, 'warning');
+            removeAlert(false);
         }
         if (data.CONFLICT) {
             alert(data.CONFLICT, 'danger');
+            removeAlert(false);
         }
         if (data.ACCEPTED) {
             alert(data.ACCEPTED, 'success');
+            removeAlert(true);
         }
     }
     xhr.send(null);
-
-    removeAlert();
 }
