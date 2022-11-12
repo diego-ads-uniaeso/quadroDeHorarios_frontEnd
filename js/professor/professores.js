@@ -272,6 +272,7 @@ function createRowProfessor(professor) {
     buttonEdit.setAttribute('type', 'button');
     buttonEdit.setAttribute('class', 'btn btn-warning bg-warning');
     buttonEdit.setAttribute('id', `${professor.idProfessor}`);
+    buttonEdit.setAttribute('onCLick', 'editProfessor(this.id)');
     buttonDelete.setAttribute('class', 'btn btn-danger bg-danger');
     buttonDelete.setAttribute('style', 'margin-left: 5px');
     buttonDelete.setAttribute('id', `${professor.idProfessor}`);
