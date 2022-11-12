@@ -1,4 +1,4 @@
-#tBodyDisciplinas {
+#tBodyDisciplinas, #tBodyProfessores {
     display: block;
     max-height: 250px;
     overflow-y: scroll;
@@ -7,4 +7,18 @@
 tr {
     display: table;
     width: 100%;
+}
+
+.idDisponibilidade, .idDisciplina {
+    cursor: pointer;
+}
+
+img {
+    display: table;
+    width: 100%;
+    height: 170vh;
+    background-position: 30% 45%;
+    background-size: cover;
+    position: absolute;
+    opacity: 0.05;
 }
