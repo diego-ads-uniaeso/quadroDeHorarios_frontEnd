@@ -1,26 +1,16 @@
- #tBodyDisciplinas {
+#tBodyDisciplinas {
      display: block;
      max-height: 250px;
      overflow-y: scroll;
- }
+}
 
- tr {
+tr {
      display: table;
      width: 100%;
- }
+}
 
- img {
-     display: table;
-     width: 100%;
-     height: 100vh;
-     background-position: 30% 45%;
-     background-size: cover;
-     position: absolute;
-     opacity: 0.05;
- }
-
- .disciplina {
+.disciplina {
     position: absolute;
     width: 100%;
     height: 100vh;
- }
+}
