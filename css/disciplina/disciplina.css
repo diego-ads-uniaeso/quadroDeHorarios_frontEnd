@@ -14,3 +14,13 @@ tr {
     width: 100%;
     height: 100vh;
 }
+
+img {
+     display: table;
+     width: 100%;
+     height: 100vh;
+     background-position: 30% 45%;
+     background-size: cover;
+     position: absolute;
+     opacity: 0.05;
+ }
